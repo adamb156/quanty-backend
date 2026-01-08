@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Project {
+  id          String             @id @default(uuid())
+  slug        String             @unique
+  published   Boolean            @default(false)
+  featured    Boolean            @default(false)
+  order       Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  translations ProjectTranslation[]
+  categories  ProjectCategory[]
+  images      ProjectImage[]
+  videos      ProjectVideo[]
+
+  @@map("projects")
+}
+
+model ProjectTranslation {
+  id          String   @id @default(uuid())
+  projectId   String
+  language    String
+  title       String
+  description String  
+  content     String? 
+  technologies String?
+  link        String?
+  metaTitle   String?
+  metaDescription String?
+  
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, language])
+  @@map("project_translations")
+}
+
+model ProjectCategory {
+  id        String   @id @default(uuid())
+  projectId String
+  categoryId String
+  
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  category  Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, categoryId])
+  @@map("project_categories")
+}
+
+model ProjectImage {
+  id        String   @id @default(uuid())
+  projectId String
+  url       String
+  alt       String?
+  order     Int      @default(0)
+  
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_images")
+}
+
+model ProjectVideo {
+  id        String   @id @default(uuid())
+  projectId String
+  url       String
+  title     String?
+  order     Int      @default(0)
+  
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("project_videos")
+}
+
+model BlogPost {
+  id          String              @id @default(uuid())
+  slug        String              @unique
+  published   Boolean             @default(false)
+  featured    Boolean             @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  translations BlogPostTranslation[]
+  categories  BlogPostCategory[]
+  images      BlogPostImage[]
+
+  @@map("blog_posts")
+}
+
+model BlogPostTranslation {
+  id          String   @id @default(uuid())
+  postId      String
+  language    String
+  title       String
+  excerpt     String? 
+  content     String  
+  author      String?
+  metaTitle   String?
+  metaDescription String?
+  
+  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, language])
+  @@map("blog_post_translations")
+}
+
+model BlogPostCategory {
+  id        String   @id @default(uuid())
+  postId    String
+  categoryId String
+  
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category  Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, categoryId])
+  @@map("blog_post_categories")
+}
+
+model BlogPostImage {
+  id        String   @id @default(uuid())
+  postId    String
+  url       String
+  alt       String?
+  caption   String?
+  order     Int      @default(0)
+  
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@map("blog_post_images")
+}
+
+model Service {
+  id          String              @id @default(uuid())
+  slug        String              @unique
+  icon        String?
+  published   Boolean             @default(true)
+  order       Int                 @default(0)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  translations ServiceTranslation[]
+
+  @@map("services")
+}
+
+model ServiceTranslation {
+  id          String   @id @default(uuid())
+  serviceId   String
+  language    String
+  title       String
+  description String  
+  features    String? 
+  
+  service     Service  @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, language])
+  @@map("service_translations")
+}
+
+model Category {
+  id          String              @id @default(uuid())
+  slug        String              @unique
+  type        String              // 'project' or 'blog'
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  translations CategoryTranslation[]
+  projects    ProjectCategory[]
+  blogPosts   BlogPostCategory[]
+
+  @@map("categories")
+}
+
+model CategoryTranslation {
+  id          String   @id @default(uuid())
+  categoryId  String
+  language    String
+  name        String
+  description String? 
+  
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, language])
+  @@map("category_translations")
+}
+
+model ContactMessage {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String  
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@map("contact_messages")
+}
+
+model ContactSubject {
+  id          String                    @id @default(uuid())
+  slug        String                    @unique
+  order       Int                       @default(0)
+  translations ContactSubjectTranslation[]
+
+  @@map("contact_subjects")
+}
+
+model ContactSubjectTranslation {
+  id        String   @id @default(uuid())
+  subjectId String
+  language  String
+  name      String
+  
+  subject   ContactSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectId, language])
+  @@map("contact_subject_translations")
+}
+
+model Settings {
+  id        String              @id @default(uuid())
+  key       String              @unique
+  translations SettingsTranslation[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@map("settings")
+}
+
+model SettingsTranslation {
+  id         String   @id @default(uuid())
+  settingsId String
+  language   String
+  value      String  
+  
+  settings   Settings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@unique([settingsId, language])
+  @@map("settings_translations")
+}
