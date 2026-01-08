@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Quanty Backend - NestJS CMS API
 
 Backend API dla strony Quanty - agencji interaktywnej. System CMS z pełną obsługą wielojęzyczności, zarządzaniem projektami, blogiem i formularzem kontaktowym.
@@ -140,3 +141,6 @@ MIT
 ## 👨‍💻 Author
 
 Quanty - Interactive Agency
+=======
+# quanty-backend
+>>>>>>> 7bc64dc74153e7c091d01634c7713ebd1851b221
